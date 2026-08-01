@@ -11,6 +11,7 @@
     "SUPABASE_URL": "replace-me",
     "SUPABASE_JWT_SECRET": "replace-me",
     "SUPABASE_CONNECTION_STRING": "replace-me",
+    "ANONYMIZATION_SECRET": "replace-me",
     "MAX_ASSETS_PER_ANALYSIS": "10"
   }
 }

@@ -4,6 +4,7 @@ using FinIA.Application.External.Bcb;
 using FinIA.Application.External.Brapi;
 using FinIA.Application.Fundamentals;
 using FinIA.Application.Persistence;
+using FinIA.Application.Security;
 
 namespace FinIA.Application.Analyses;
 
@@ -12,15 +13,17 @@ public sealed class AnalysisApplicationService(
     IBcbClient bcbClient,
     IBrapiClient brapiClient,
     IFundamentalAnalysisService fundamentalAnalysisService,
-    IAiAnalysisService aiAnalysisService) : IAnalysisApplicationService
+    IAiAnalysisService aiAnalysisService,
+    IUserAnonymizer userAnonymizer) : IAnalysisApplicationService
 {
     public async Task<CreateAnalysisResponse> CreateAsync(
         AuthenticatedUser user,
         IReadOnlyCollection<string> normalizedTickers,
         CancellationToken cancellationToken)
     {
+        var anonymizedUserId = userAnonymizer.Anonymize(user.UserId);
         var created = await repository.CreateAsync(
-            new CreateAnalysisRecord(user.UserId, normalizedTickers),
+            new CreateAnalysisRecord(anonymizedUserId, normalizedTickers),
             cancellationToken);
 
         var macro = await bcbClient.GetMacroIndicatorsAsync(cancellationToken);
@@ -50,7 +53,7 @@ public sealed class AnalysisApplicationService(
 
         return new CreateAnalysisResponse(
             AnalysisId: created.AnalysisId,
-            UserId: created.UserId,
+            UserId: user.UserId,
             Status: "completed",
             Results: results);
     }

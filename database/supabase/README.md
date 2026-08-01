@@ -11,7 +11,9 @@ Este diretorio contem os scripts SQL do Supabase PostgreSQL.
 - Cada analise pertence a um usuario autenticado.
 - Cada analise aceita no maximo 10 papeis.
 - Os dados retornados por Brapi, Banco Central e OpenAI sao salvos como snapshots.
-- As politicas RLS impedem que um usuario leia dados de outro usuario.
+- Identificadores reais do Supabase Auth nao devem ser gravados nas tabelas de negocio.
+- A aplicacao grava `anonymized_user_id`, derivado por HMAC-SHA256 no backend.
+- As politicas RLS esperam a claim `anonymized_user_id` quando houver acesso direto com JWT.
 
 ## Aplicacao Manual
 

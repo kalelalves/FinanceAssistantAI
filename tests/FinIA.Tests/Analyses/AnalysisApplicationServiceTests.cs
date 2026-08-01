@@ -5,6 +5,7 @@ using FinIA.Application.External.Bcb;
 using FinIA.Application.External.Brapi;
 using FinIA.Application.Fundamentals;
 using FinIA.Application.Persistence;
+using FinIA.Application.Security;
 
 namespace FinIA.Tests.Analyses;
 
@@ -18,14 +19,17 @@ public sealed class AnalysisApplicationServiceTests
             new FakeBcbClient(),
             new FakeBrapiClient(),
             new FundamentalAnalysisService(),
-            new FakeAiService());
+            new FakeAiService(),
+            new FakeUserAnonymizer());
 
+        var authenticatedUserId = Guid.NewGuid();
         var response = await service.CreateAsync(
-            new AuthenticatedUser(Guid.NewGuid(), "user@example.com"),
+            new AuthenticatedUser(authenticatedUserId, "user@example.com"),
             ["PETR4"],
             CancellationToken.None);
 
         Assert.Equal("completed", response.Status);
+        Assert.Equal(authenticatedUserId, response.UserId);
         Assert.Single(response.Results);
         Assert.Equal("PETR4", response.Results.First().Ticker);
     }
@@ -34,7 +38,19 @@ public sealed class AnalysisApplicationServiceTests
     {
         public Task<CreatedAnalysisRecord> CreateAsync(CreateAnalysisRecord record, CancellationToken cancellationToken)
         {
-            return Task.FromResult(new CreatedAnalysisRecord(Guid.NewGuid(), record.UserId, "pending", record.Tickers));
+            Assert.Equal(FakeUserAnonymizer.AnonymizedUserId, record.AnonymizedUserId);
+
+            return Task.FromResult(new CreatedAnalysisRecord(Guid.NewGuid(), record.AnonymizedUserId, "pending", record.Tickers));
+        }
+    }
+
+    private sealed class FakeUserAnonymizer : IUserAnonymizer
+    {
+        public static readonly Guid AnonymizedUserId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+
+        public Guid Anonymize(Guid userId)
+        {
+            return AnonymizedUserId;
         }
     }
 

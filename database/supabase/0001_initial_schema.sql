@@ -1,16 +1,15 @@
 create extension if not exists pgcrypto;
 
 create table if not exists public.profiles (
-    id uuid primary key references auth.users(id) on delete cascade,
-    email text,
-    display_name text,
+    anonymized_user_id uuid primary key,
+    display_alias text,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
 
 create table if not exists public.analysis_requests (
     id uuid primary key default gen_random_uuid(),
-    user_id uuid not null references auth.users(id) on delete cascade,
+    anonymized_user_id uuid not null,
     status text not null default 'pending',
     assets_count integer not null default 0,
     requested_at timestamptz not null default now(),
@@ -79,7 +78,7 @@ create table if not exists public.ai_analysis_results (
 
 create table if not exists public.usage_events (
     id uuid primary key default gen_random_uuid(),
-    user_id uuid references auth.users(id) on delete set null,
+    anonymized_user_id uuid,
     analysis_request_id uuid references public.analysis_requests(id) on delete set null,
     event_type text not null,
     provider text,
@@ -93,13 +92,21 @@ create table if not exists public.usage_events (
 );
 
 create index if not exists ix_analysis_requests_user_requested_at
-    on public.analysis_requests(user_id, requested_at desc);
+    on public.analysis_requests(anonymized_user_id, requested_at desc);
 
 create index if not exists ix_analysis_assets_request
     on public.analysis_assets(analysis_request_id);
 
 create index if not exists ix_usage_events_user_created_at
-    on public.usage_events(user_id, created_at desc);
+    on public.usage_events(anonymized_user_id, created_at desc);
+
+create or replace function public.current_anonymized_user_id()
+returns uuid
+language sql
+stable
+as $$
+    select nullif(current_setting('request.jwt.claim.anonymized_user_id', true), '')::uuid;
+$$;
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -163,20 +170,20 @@ alter table public.usage_events enable row level security;
 
 create policy "profiles_select_own"
 on public.profiles for select
-using (id = auth.uid());
+using (anonymized_user_id = public.current_anonymized_user_id());
 
 create policy "profiles_update_own"
 on public.profiles for update
-using (id = auth.uid())
-with check (id = auth.uid());
+using (anonymized_user_id = public.current_anonymized_user_id())
+with check (anonymized_user_id = public.current_anonymized_user_id());
 
 create policy "analysis_requests_select_own"
 on public.analysis_requests for select
-using (user_id = auth.uid());
+using (anonymized_user_id = public.current_anonymized_user_id());
 
 create policy "analysis_requests_insert_own"
 on public.analysis_requests for insert
-with check (user_id = auth.uid());
+with check (anonymized_user_id = public.current_anonymized_user_id());
 
 create policy "analysis_assets_select_own"
 on public.analysis_assets for select
@@ -185,7 +192,7 @@ using (
         select 1
         from public.analysis_requests ar
         where ar.id = analysis_request_id
-          and ar.user_id = auth.uid()
+          and ar.anonymized_user_id = public.current_anonymized_user_id()
     )
 );
 
@@ -197,7 +204,7 @@ using (
         from public.analysis_assets aa
         join public.analysis_requests ar on ar.id = aa.analysis_request_id
         where aa.id = analysis_asset_id
-          and ar.user_id = auth.uid()
+          and ar.anonymized_user_id = public.current_anonymized_user_id()
     )
 );
 
@@ -208,7 +215,7 @@ using (
         select 1
         from public.analysis_requests ar
         where ar.id = analysis_request_id
-          and ar.user_id = auth.uid()
+          and ar.anonymized_user_id = public.current_anonymized_user_id()
     )
 );
 
@@ -220,10 +227,10 @@ using (
         from public.analysis_assets aa
         join public.analysis_requests ar on ar.id = aa.analysis_request_id
         where aa.id = analysis_asset_id
-          and ar.user_id = auth.uid()
+          and ar.anonymized_user_id = public.current_anonymized_user_id()
     )
 );
 
 create policy "usage_events_select_own"
 on public.usage_events for select
-using (user_id = auth.uid());
+using (anonymized_user_id = public.current_anonymized_user_id());

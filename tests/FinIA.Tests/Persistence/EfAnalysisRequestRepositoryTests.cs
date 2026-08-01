@@ -11,16 +11,17 @@ public sealed class EfAnalysisRequestRepositoryTests
     {
         await using var dbContext = CreateDbContext();
         var repository = new EfAnalysisRequestRepository(dbContext);
-        var userId = Guid.NewGuid();
+        var anonymizedUserId = Guid.NewGuid();
 
         var created = await repository.CreateAsync(
-            new CreateAnalysisRecord(userId, ["PETR4", "VALE3"]),
+            new CreateAnalysisRecord(anonymizedUserId, ["PETR4", "VALE3"]),
             CancellationToken.None);
 
-        Assert.Equal(userId, created.UserId);
+        Assert.Equal(anonymizedUserId, created.AnonymizedUserId);
         Assert.Equal("pending", created.Status);
         Assert.Equal(["PETR4", "VALE3"], created.Tickers);
         Assert.Equal(1, await dbContext.AnalysisRequests.CountAsync());
+        Assert.Equal(anonymizedUserId, await dbContext.AnalysisRequests.Select(x => x.AnonymizedUserId).SingleAsync());
         Assert.Equal(2, await dbContext.AnalysisAssets.CountAsync());
     }
 

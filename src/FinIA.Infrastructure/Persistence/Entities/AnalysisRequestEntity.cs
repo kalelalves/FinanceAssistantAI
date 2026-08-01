@@ -4,7 +4,7 @@ public sealed class AnalysisRequestEntity
 {
     public Guid Id { get; set; }
 
-    public Guid UserId { get; set; }
+    public Guid AnonymizedUserId { get; set; }
 
     public string Status { get; set; } = "pending";
 

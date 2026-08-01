@@ -20,5 +20,7 @@ public sealed class FinIaOptions
 
     public string? SupabaseConnectionString { get; init; }
 
+    public string? AnonymizationSecret { get; init; }
+
     public int MaxAssetsPerAnalysis { get; init; } = 10;
 }

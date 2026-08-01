@@ -13,6 +13,12 @@ public static class FinIaOptionsValidator
         AddIfMissing(missing, nameof(options.SupabaseUrl), options.SupabaseUrl);
         AddIfMissing(missing, nameof(options.SupabaseJwtSecret), options.SupabaseJwtSecret);
         AddIfMissing(missing, nameof(options.SupabaseConnectionString), options.SupabaseConnectionString);
+        AddIfMissing(missing, nameof(options.AnonymizationSecret), options.AnonymizationSecret);
+
+        if (!string.IsNullOrWhiteSpace(options.AnonymizationSecret) && options.AnonymizationSecret.Length < 32)
+        {
+            missing.Add($"{nameof(options.AnonymizationSecret)} must be at least 32 characters");
+        }
 
         if (options.MaxAssetsPerAnalysis != AnalysisLimits.MaxAssetsPerRequest)
         {

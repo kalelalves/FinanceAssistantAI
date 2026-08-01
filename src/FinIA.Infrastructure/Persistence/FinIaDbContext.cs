@@ -20,7 +20,7 @@ public sealed class FinIaDbContext(DbContextOptions<FinIaDbContext> options) : D
             entity.ToTable("analysis_requests");
             entity.HasKey(x => x.Id);
             entity.Property(x => x.Id).HasColumnName("id");
-            entity.Property(x => x.UserId).HasColumnName("user_id");
+            entity.Property(x => x.AnonymizedUserId).HasColumnName("anonymized_user_id");
             entity.Property(x => x.Status).HasColumnName("status");
             entity.Property(x => x.AssetsCount).HasColumnName("assets_count");
             entity.Property(x => x.RequestedAt).HasColumnName("requested_at");

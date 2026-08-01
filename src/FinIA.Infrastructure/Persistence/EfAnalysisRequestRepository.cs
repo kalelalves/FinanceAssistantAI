@@ -11,7 +11,7 @@ public sealed class EfAnalysisRequestRepository(FinIaDbContext dbContext) : IAna
         var request = new AnalysisRequestEntity
         {
             Id = Guid.NewGuid(),
-            UserId = record.UserId,
+            AnonymizedUserId = record.AnonymizedUserId,
             Status = "pending",
             AssetsCount = record.Tickers.Count,
             RequestedAt = DateTimeOffset.UtcNow,
@@ -28,7 +28,7 @@ public sealed class EfAnalysisRequestRepository(FinIaDbContext dbContext) : IAna
 
         return new CreatedAnalysisRecord(
             request.Id,
-            request.UserId,
+            request.AnonymizedUserId,
             request.Status,
             request.Assets.Select(asset => asset.Ticker).ToArray());
     }

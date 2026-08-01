@@ -3,6 +3,7 @@ using FinIA.Application.Auth;
 using FinIA.Application.Configuration;
 using FinIA.Application.Fundamentals;
 using FinIA.Application.Health;
+using FinIA.Application.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,6 +23,7 @@ public static class DependencyInjection
             SupabaseUrl = configuration["SUPABASE_URL"],
             SupabaseJwtSecret = configuration["SUPABASE_JWT_SECRET"],
             SupabaseConnectionString = configuration["SUPABASE_CONNECTION_STRING"],
+            AnonymizationSecret = configuration["ANONYMIZATION_SECRET"],
             MaxAssetsPerAnalysis = int.TryParse(configuration["MAX_ASSETS_PER_ANALYSIS"], out var maxAssets)
                 ? maxAssets
                 : FinIA.Domain.Analysis.AnalysisLimits.MaxAssetsPerRequest
@@ -33,6 +35,7 @@ public static class DependencyInjection
         services.AddSingleton<ISupabaseJwtValidator, SupabaseJwtValidator>();
         services.AddSingleton<IHealthService, HealthService>();
         services.AddSingleton<IAnalysisRequestValidator, AnalysisRequestValidator>();
+        services.AddSingleton<IUserAnonymizer, HmacSha256UserAnonymizer>();
         services.AddSingleton<IAnalysisApplicationService, AnalysisApplicationService>();
         services.AddSingleton<IFundamentalAnalysisService, FundamentalAnalysisService>();
 

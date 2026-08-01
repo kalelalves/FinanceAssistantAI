@@ -1,5 +1,5 @@
 namespace FinIA.Application.Persistence;
 
 public sealed record CreateAnalysisRecord(
-    Guid UserId,
+    Guid AnonymizedUserId,
     IReadOnlyCollection<string> Tickers);

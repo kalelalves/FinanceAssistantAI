@@ -76,6 +76,8 @@ Ambos usam `IHttpClientFactory` e timeouts curtos para evitar travar o fluxo de 
 
 O projeto usa EF Core com PostgreSQL/Supabase na Infrastructure. O schema SQL versionado fica em `database/supabase`.
 
+Os identificadores reais do Supabase Auth nao sao gravados nas tabelas de negocio. O backend calcula um `anonymized_user_id` deterministico por HMAC-SHA256 antes de persistir analises.
+
 ## Motor Fundamentalista
 
 O motor calcula score, preco-alvo base, horizonte e diagnostico preliminar antes da chamada para IA.
