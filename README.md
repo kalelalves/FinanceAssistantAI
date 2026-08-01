@@ -74,3 +74,7 @@ Ambos usam `IHttpClientFactory` e timeouts curtos para evitar travar o fluxo de 
 ## Persistencia
 
 O projeto usa EF Core com PostgreSQL/Supabase na Infrastructure. O schema SQL versionado fica em `database/supabase`.
+
+## Motor Fundamentalista
+
+O motor calcula score, preco-alvo base, horizonte e diagnostico preliminar antes da chamada para IA.

@@ -1,6 +1,7 @@
 using FinIA.Application.Analyses;
 using FinIA.Application.Auth;
 using FinIA.Application.Configuration;
+using FinIA.Application.Fundamentals;
 using FinIA.Application.Health;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,6 +34,7 @@ public static class DependencyInjection
         services.AddSingleton<IHealthService, HealthService>();
         services.AddSingleton<IAnalysisRequestValidator, AnalysisRequestValidator>();
         services.AddSingleton<IAnalysisApplicationService, AnalysisApplicationService>();
+        services.AddSingleton<IFundamentalAnalysisService, FundamentalAnalysisService>();
 
         return services;
     }
