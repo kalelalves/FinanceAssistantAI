@@ -1,3 +1,5 @@
+using FinIA.Application.Analyses;
+using FinIA.Application.Auth;
 using FinIA.Application.Configuration;
 using FinIA.Application.Health;
 using Microsoft.Extensions.Configuration;
@@ -26,7 +28,11 @@ public static class DependencyInjection
 
         services.AddSingleton(options);
         services.AddSingleton(FinIaOptionsValidator.Validate(options));
+        services.AddSingleton<IBearerTokenReader, BearerTokenReader>();
+        services.AddSingleton<ISupabaseJwtValidator, SupabaseJwtValidator>();
         services.AddSingleton<IHealthService, HealthService>();
+        services.AddSingleton<IAnalysisRequestValidator, AnalysisRequestValidator>();
+        services.AddSingleton<IAnalysisApplicationService, AnalysisApplicationService>();
 
         return services;
     }
