@@ -63,3 +63,10 @@ Content-Type: application/json
 ```
 
 O endpoint rejeita requisicoes sem Bearer token valido e bloqueia mais de 10 tickers antes de qualquer chamada externa.
+
+## Clientes Externos
+
+- `IBcbClient`: consulta series SGS do Banco Central.
+- `IBrapiClient`: consulta cotacao e fundamentos basicos via Brapi.dev.
+
+Ambos usam `IHttpClientFactory` e timeouts curtos para evitar travar o fluxo de analise.
