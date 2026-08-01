@@ -89,3 +89,7 @@ O motor calcula score, preco-alvo base, horizonte e diagnostico preliminar antes
 - CI em `.github/workflows/ci.yml`.
 - Configuracao de ambiente em `docs/environment.md`.
 - `KeepAliveFunction` executa a cada 3 dias para manter o ambiente aquecido.
+
+## QA
+
+O checklist final do MVP esta em `docs/qa-final.md`.
