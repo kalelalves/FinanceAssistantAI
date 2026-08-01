@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FinIA.Application/FinIA.Application.csproj" />
+    <Project Path="src/FinIA.Domain/FinIA.Domain.csproj" />
+    <Project Path="src/FinIA.Functions/FinIA.Functions.csproj" />
+    <Project Path="src/FinIA.Infrastructure/FinIA.Infrastructure.csproj" />
+    <Project Path="src/FinIA.Web/FinIA.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FinIA.Tests/FinIA.Tests.csproj" />
+  </Folder>
+</Solution>
