@@ -1,17 +1,151 @@
-﻿@page "/"
+@page "/"
+@using System.Net.Http.Headers
+@using System.Net.Http.Json
+@inject HttpClient Http
 
 <PageTitle>FinIA</PageTitle>
 
-<h1>FinIA</h1>
+<main class="workspace">
+    <section class="analysis-panel">
+        <h1>FinIA</h1>
+        <p>Analise fundamentalista objetiva para ate 10 papeis.</p>
 
-<p>Analise fundamentalista objetiva para ate 10 papeis por consulta.</p>
+        <label for="apiBase">API</label>
+        <input id="apiBase" @bind="apiBaseUrl" placeholder="http://localhost:7071" />
 
-<section>
-    <h2>MVP</h2>
-    <ul>
-        <li>Backend .NET 10 em Azure Functions.</li>
-        <li>Dados macroeconomicos do Banco Central.</li>
-        <li>Fundamentos e cotacoes via Brapi.dev.</li>
-        <li>Resposta compacta com preco-alvo, horizonte e diagnostico.</li>
-    </ul>
-</section>
+        <label for="token">Bearer token</label>
+        <textarea id="token" @bind="bearerToken" rows="3" placeholder="Cole o JWT do Supabase"></textarea>
+
+        <label for="tickers">Tickers</label>
+        <input id="tickers" @bind="tickerText" placeholder="PETR4, VALE3, ITUB4" />
+
+        <div class="toolbar">
+            <button @onclick="SubmitAsync" disabled="@isLoading">Analisar</button>
+            <span>@TickerCount/10 papeis</span>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <p class="error">@errorMessage</p>
+        }
+    </section>
+
+    <section class="results-grid">
+        @if (isLoading)
+        {
+            <article class="result-card">Processando...</article>
+        }
+        else if (analysisResponse?.Results.Count > 0)
+        {
+            @foreach (var result in analysisResponse.Results)
+            {
+                <article class="result-card">
+                    <header>
+                        <strong>@result.Ticker</strong>
+                        <span>@result.Diagnosis</span>
+                    </header>
+                    <dl>
+                        <dt>Preco atual</dt>
+                        <dd>@FormatMoney(result.CurrentPrice)</dd>
+                        <dt>Preco-alvo</dt>
+                        <dd>@FormatMoney(result.TargetPrice)</dd>
+                        <dt>Horizonte</dt>
+                        <dd>@result.Horizon</dd>
+                    </dl>
+                    <p>@result.Summary</p>
+                </article>
+            }
+        }
+        else
+        {
+            <article class="result-card">Informe os dados e envie uma analise.</article>
+        }
+    </section>
+</main>
+
+@code {
+    private string apiBaseUrl = "http://localhost:7071";
+    private string bearerToken = string.Empty;
+    private string tickerText = "PETR4, VALE3";
+    private string? errorMessage;
+    private bool isLoading;
+    private AnalysisResponse? analysisResponse;
+
+    private int TickerCount => ParseTickers().Count;
+
+    private async Task SubmitAsync()
+    {
+        errorMessage = null;
+        analysisResponse = null;
+        var tickers = ParseTickers();
+
+        if (tickers.Count == 0)
+        {
+            errorMessage = "Informe ao menos um ticker.";
+            return;
+        }
+
+        if (tickers.Count > 10)
+        {
+            errorMessage = "Limite maximo de 10 papeis.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(bearerToken))
+        {
+            errorMessage = "Informe o Bearer token.";
+            return;
+        }
+
+        isLoading = true;
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Post, $"{apiBaseUrl.TrimEnd('/')}/api/analyses")
+            {
+                Content = JsonContent.Create(new { tickers })
+            };
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken.Trim());
+
+            using var response = await Http.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                errorMessage = $"Erro na analise: {(int)response.StatusCode}";
+                return;
+            }
+
+            analysisResponse = await response.Content.ReadFromJsonAsync<AnalysisResponse>();
+        }
+        catch (HttpRequestException ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private IReadOnlyCollection<string> ParseTickers()
+    {
+        return tickerText
+            .Split([',', ';', ' ', '\n', '\r', '\t'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(ticker => ticker.ToUpperInvariant())
+            .Distinct()
+            .ToArray();
+    }
+
+    private static string FormatMoney(decimal? value)
+    {
+        return value is null ? "n/d" : $"R$ {value:0.00}";
+    }
+
+    private sealed record AnalysisResponse(IReadOnlyCollection<AssetResult> Results);
+
+    private sealed record AssetResult(
+        string Ticker,
+        decimal? CurrentPrice,
+        decimal? TargetPrice,
+        string Horizon,
+        string Diagnosis,
+        string Summary);
+}
