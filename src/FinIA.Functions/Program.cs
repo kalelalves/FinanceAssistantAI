@@ -12,8 +12,8 @@ var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
 builder.Services
-    .AddApplication()
-    .AddInfrastructure();
+    .AddApplication(builder.Configuration)
+    .AddInfrastructure(builder.Configuration);
 
 if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING")))
 {

@@ -4,4 +4,5 @@ public sealed record HealthResponse(
     string Status,
     string Service,
     string Runtime,
-    DateTimeOffset CheckedAtUtc);
+    DateTimeOffset CheckedAtUtc,
+    IReadOnlyCollection<string> MissingSettings);

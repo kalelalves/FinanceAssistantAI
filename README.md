@@ -34,3 +34,18 @@ dotnet test FinIA.slnx
 ```
 
 O projeto de Functions usa `local.settings.json` apenas localmente. Segredos reais devem ficar fora do Git.
+
+## Backend
+
+Copie `src/FinIA.Functions/local.settings.json.example` para `src/FinIA.Functions/local.settings.json` e preencha os valores locais.
+
+```powershell
+cd src/FinIA.Functions
+func start
+```
+
+Health check:
+
+```text
+GET http://localhost:7071/api/health
+```

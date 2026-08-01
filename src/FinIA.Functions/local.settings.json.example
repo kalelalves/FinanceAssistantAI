@@ -1,0 +1,16 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "BCB_BASE_URL": "https://api.bcb.gov.br",
+    "BRAPI_BASE_URL": "https://brapi.dev",
+    "BRAPI_TOKEN": "replace-me",
+    "OPENAI_API_KEY": "replace-me",
+    "OPENAI_MODEL": "gpt-4o-mini",
+    "SUPABASE_URL": "replace-me",
+    "SUPABASE_JWT_SECRET": "replace-me",
+    "SUPABASE_CONNECTION_STRING": "replace-me",
+    "MAX_ASSETS_PER_ANALYSIS": "10"
+  }
+}
