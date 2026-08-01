@@ -42,7 +42,11 @@ public sealed class CreateAnalysisFunction(
                 validation.ErrorMessage ?? "Invalid analysis request."));
         }
 
-        var response = analysisApplicationService.Create(authResult.User, validation.NormalizedTickers);
+        var response = await analysisApplicationService.CreateAsync(
+            authResult.User,
+            validation.NormalizedTickers,
+            cancellationToken);
+
         return new AcceptedResult($"/api/analyses/{response.AnalysisId}", response);
     }
 }
