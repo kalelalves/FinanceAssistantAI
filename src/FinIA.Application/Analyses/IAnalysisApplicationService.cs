@@ -4,5 +4,8 @@ namespace FinIA.Application.Analyses;
 
 public interface IAnalysisApplicationService
 {
-    CreateAnalysisResponse Create(AuthenticatedUser user, IReadOnlyCollection<string> normalizedTickers);
+    Task<CreateAnalysisResponse> CreateAsync(
+        AuthenticatedUser user,
+        IReadOnlyCollection<string> normalizedTickers,
+        CancellationToken cancellationToken);
 }

@@ -70,3 +70,7 @@ O endpoint rejeita requisicoes sem Bearer token valido e bloqueia mais de 10 tic
 - `IBrapiClient`: consulta cotacao e fundamentos basicos via Brapi.dev.
 
 Ambos usam `IHttpClientFactory` e timeouts curtos para evitar travar o fluxo de analise.
+
+## Persistencia
+
+O projeto usa EF Core com PostgreSQL/Supabase na Infrastructure. O schema SQL versionado fica em `database/supabase`.
