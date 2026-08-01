@@ -78,3 +78,7 @@ O projeto usa EF Core com PostgreSQL/Supabase na Infrastructure. O schema SQL ve
 ## Motor Fundamentalista
 
 O motor calcula score, preco-alvo base, horizonte e diagnostico preliminar antes da chamada para IA.
+
+## IA
+
+`IAiAnalysisService` usa OpenAI quando `OPENAI_API_KEY` esta configurada e retorna fallback deterministico quando a IA falha ou nao esta configurada.

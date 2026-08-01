@@ -1,9 +1,11 @@
+using FinIA.Application.Ai;
 using FinIA.Application.Configuration;
 using FinIA.Application.External.Bcb;
 using FinIA.Application.External.Brapi;
 using FinIA.Application.Persistence;
 using FinIA.Infrastructure.External.Bcb;
 using FinIA.Infrastructure.External.Brapi;
+using FinIA.Infrastructure.Ai;
 using FinIA.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -35,6 +37,11 @@ public static class DependencyInjection
         services.AddHttpClient<IBrapiClient, BrapiClient>((provider, client) =>
         {
             BrapiClient.Configure(client, provider.GetRequiredService<FinIaOptions>());
+        });
+
+        services.AddHttpClient<IAiAnalysisService, OpenAiAnalysisService>((_, client) =>
+        {
+            OpenAiAnalysisService.Configure(client);
         });
 
         return services;
