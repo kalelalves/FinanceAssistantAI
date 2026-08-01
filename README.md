@@ -63,6 +63,7 @@ Content-Type: application/json
 ```
 
 O endpoint rejeita requisicoes sem Bearer token valido e bloqueia mais de 10 tickers antes de qualquer chamada externa.
+Quando validado, o backend salva a solicitacao, busca indicadores macro, consulta Brapi, calcula fundamentos e retorna respostas compactas.
 
 ## Clientes Externos
 

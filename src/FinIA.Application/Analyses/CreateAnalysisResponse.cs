@@ -4,4 +4,4 @@ public sealed record CreateAnalysisResponse(
     Guid AnalysisId,
     Guid UserId,
     string Status,
-    IReadOnlyCollection<string> Tickers);
+    IReadOnlyCollection<AssetAnalysisResponse> Results);
