@@ -83,3 +83,9 @@ O motor calcula score, preco-alvo base, horizonte e diagnostico preliminar antes
 ## IA
 
 `IAiAnalysisService` usa OpenAI quando `OPENAI_API_KEY` esta configurada e retorna fallback deterministico quando a IA falha ou nao esta configurada.
+
+## Operacao
+
+- CI em `.github/workflows/ci.yml`.
+- Configuracao de ambiente em `docs/environment.md`.
+- `KeepAliveFunction` executa a cada 3 dias para manter o ambiente aquecido.
