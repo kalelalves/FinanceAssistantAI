@@ -49,3 +49,17 @@ Health check:
 ```text
 GET http://localhost:7071/api/health
 ```
+
+Criar analise:
+
+```text
+POST http://localhost:7071/api/analyses
+Authorization: Bearer <supabase-jwt>
+Content-Type: application/json
+
+{
+  "tickers": ["PETR4", "VALE3"]
+}
+```
+
+O endpoint rejeita requisicoes sem Bearer token valido e bloqueia mais de 10 tickers antes de qualquer chamada externa.
