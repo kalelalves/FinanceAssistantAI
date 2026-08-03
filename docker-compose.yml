@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: docker/functions.Dockerfile
     environment:
-      AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=finia;AccountKey=${AZURITE_ACCOUNT_KEY:-ZmLuaWEtZX0ZvckxvY2FsRGV2ZWxvcG1lbnQxMjM0NTY3ODkwMTI=};BlobEndpoint=http://azurite:10000/finia;QueueEndpoint=http://azurite:10001/finia;TableEndpoint=http://azurite:10002/finia"
+      AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1"
       FUNCTIONS_WORKER_RUNTIME: dotnet-isolated
       BCB_BASE_URL: ${BCB_BASE_URL:-https://api.bcb.gov.br}
       BRAPI_BASE_URL: ${BRAPI_BASE_URL:-https://brapi.dev}
@@ -58,8 +58,6 @@ services:
 
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite:3.35.0
-    environment:
-      AZURITE_ACCOUNTS: finia:${AZURITE_ACCOUNT_KEY:-ZmLuaWEtZX0ZvckxvY2FsRGV2ZWxvcG1lbnQxMjM0NTY3ODkwMTI=}
     command: azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0
     ports:
       - "10000:10000"

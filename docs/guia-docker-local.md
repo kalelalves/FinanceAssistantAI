@@ -23,7 +23,6 @@ Copy-Item .env.example .env
 Edite `.env` e preencha pelo menos:
 
 ```text
-AZURITE_ACCOUNT_KEY=ZmLuaWEtZX0ZvckxvY2FsRGV2ZWxvcG1lbnQxMjM0NTY3ODkwMTI=
 BRAPI_TOKEN=...
 SUPABASE_URL=https://seu-projeto.supabase.co
 SUPABASE_JWT_SECRET=...
@@ -124,6 +123,8 @@ Confirme se o container `azurite` esta rodando:
 ```powershell
 docker compose ps
 ```
+
+O Compose usa a conta padrao local `devstoreaccount1` do Azurite.
 
 ### Banco nao tem tabelas
 
