@@ -1,0 +1,13 @@
+**/.git
+**/.github
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/TestResults
+**/local.settings.json
+**/*.user
+**/*.suo
+**/.DS_Store
+docs
+D:\Obesidian

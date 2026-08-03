@@ -2,6 +2,8 @@
 
 Este guia mostra como preparar o ambiente e rodar a aplicacao localmente: Azure Functions no backend e Blazor WebAssembly no frontend.
 
+Para rodar tudo em containers, use `docs/guia-docker-local.md`.
+
 ## Pre-requisitos
 
 - Windows com PowerShell.

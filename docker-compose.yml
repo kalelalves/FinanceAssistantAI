@@ -1,0 +1,79 @@
+services:
+  finia-api:
+    build:
+      context: .
+      dockerfile: docker/functions.Dockerfile
+    environment:
+      AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=finia;AccountKey=${AZURITE_ACCOUNT_KEY:-ZmLuaWEtZX0ZvckxvY2FsRGV2ZWxvcG1lbnQxMjM0NTY3ODkwMTI=};BlobEndpoint=http://azurite:10000/finia;QueueEndpoint=http://azurite:10001/finia;TableEndpoint=http://azurite:10002/finia"
+      FUNCTIONS_WORKER_RUNTIME: dotnet-isolated
+      BCB_BASE_URL: ${BCB_BASE_URL:-https://api.bcb.gov.br}
+      BRAPI_BASE_URL: ${BRAPI_BASE_URL:-https://brapi.dev}
+      BRAPI_TOKEN: ${BRAPI_TOKEN:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      SUPABASE_URL: ${SUPABASE_URL:-}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET:-}
+      SUPABASE_CONNECTION_STRING: Host=postgres;Port=5432;Database=${POSTGRES_DB:-finia};Username=${POSTGRES_USER:-finia};Password=${POSTGRES_PASSWORD:-finia-local-password}
+      ANONYMIZATION_SECRET: ${ANONYMIZATION_SECRET:-}
+      MAX_ASSETS_PER_ANALYSIS: ${MAX_ASSETS_PER_ANALYSIS:-10}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      azurite:
+        condition: service_started
+    ports:
+      - "7071:80"
+    networks:
+      - finia-local
+
+  finia-web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+    depends_on:
+      - finia-api
+    ports:
+      - "5027:80"
+    networks:
+      - finia-local
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-finia}
+      POSTGRES_USER: ${POSTGRES_USER:-finia}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finia-local-password}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-finia} -d ${POSTGRES_DB:-finia}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+    volumes:
+      - finia-postgres-data:/var/lib/postgresql/data
+      - ./database/supabase/0001_initial_schema.sql:/docker-entrypoint-initdb.d/0001_initial_schema.sql:ro
+    networks:
+      - finia-local
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:3.35.0
+    environment:
+      AZURITE_ACCOUNTS: finia:${AZURITE_ACCOUNT_KEY:-ZmLuaWEtZX0ZvckxvY2FsRGV2ZWxvcG1lbnQxMjM0NTY3ODkwMTI=}
+    command: azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    volumes:
+      - finia-azurite-data:/data
+    networks:
+      - finia-local
+
+volumes:
+  finia-postgres-data:
+  finia-azurite-data:
+
+networks:
+  finia-local:
+    driver: bridge
