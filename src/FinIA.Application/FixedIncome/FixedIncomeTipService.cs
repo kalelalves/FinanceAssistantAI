@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace FinIA.Application.FixedIncome;
 
@@ -31,6 +32,7 @@ public sealed class FixedIncomeTipService : IFixedIncomeTipService
     public FixedIncomeTipResponse BuildTips(string message)
     {
         var normalized = Normalize(message);
+        var amount = TryExtractAmount(normalized);
         var tips = new List<FixedIncomeTip>
         {
             new("Reserva", "Para dinheiro de emergencia, priorize liquidez diaria, baixo risco e pos-fixado ao CDI/Selic."),
@@ -38,6 +40,11 @@ public sealed class FixedIncomeTipService : IFixedIncomeTipService
             new("Risco", "CDB, LCI e LCA contam com FGC dentro dos limites vigentes; Tesouro depende do governo federal."),
             new("Comparacao", "Compare rentabilidade liquida: IR, prazo, liquidez e percentual do CDI mudam o resultado final.")
         };
+
+        if (amount is not null)
+        {
+            tips.Insert(0, new("Valor informado", BuildAmountTip(amount.Value, normalized)));
+        }
 
         if (normalized.Contains("IPCA"))
         {
@@ -52,6 +59,16 @@ public sealed class FixedIncomeTipService : IFixedIncomeTipService
         if (normalized.Contains("LCI") || normalized.Contains("LCA"))
         {
             tips.Add(new("Isencao", "LCI/LCA podem ser isentas de IR para pessoa fisica, mas compare liquidez e taxa equivalente ao CDB."));
+        }
+
+        if (normalized.Contains("CURTO PRAZO") || normalized.Contains("6 MESES") || normalized.Contains("12 MESES") || normalized.Contains("1 ANO"))
+        {
+            tips.Add(new("Curto prazo", "Prefira baixa volatilidade e liquidez: Tesouro Selic, CDB liquidez diaria ou fundo DI simples."));
+        }
+
+        if (normalized.Contains("LONGO PRAZO") || normalized.Contains("APOSENTADORIA") || normalized.Contains("5 ANOS"))
+        {
+            tips.Add(new("Longo prazo", "Pode combinar pos-fixado com IPCA+ para preservar poder de compra, respeitando vencimento e marcação a mercado."));
         }
 
         return new FixedIncomeTipResponse(
@@ -73,5 +90,30 @@ public sealed class FixedIncomeTipService : IFixedIncomeTipService
         }
 
         return builder.ToString().Normalize(NormalizationForm.FormC);
+    }
+
+    private static decimal? TryExtractAmount(string normalized)
+    {
+        var match = Regex.Match(normalized, @"\b\d{3,}(?:[.,]\d{2})?\b");
+        if (!match.Success)
+        {
+            return null;
+        }
+
+        var value = match.Value.Replace(".", string.Empty).Replace(",", ".");
+        return decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var amount)
+            ? amount
+            : null;
+    }
+
+    private static string BuildAmountTip(decimal amount, string normalized)
+    {
+        var formatted = amount.ToString("C0", CultureInfo.GetCultureInfo("pt-BR"));
+        if (normalized.Contains("RESERVA") || normalized.Contains("EMERGENCIA"))
+        {
+            return $"Para {formatted}, se for reserva, priorize liquidez diaria e baixo risco antes de buscar taxa maior.";
+        }
+
+        return $"Para {formatted}, separe primeiro a reserva de emergencia; depois compare CDB, LCI/LCA e Tesouro pelo prazo.";
     }
 }

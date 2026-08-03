@@ -27,4 +27,16 @@ public sealed class FixedIncomeTipServiceTests
         Assert.Contains(response.Tips, tip => tip.Title == "IPCA+");
         Assert.Contains(response.Tips, tip => tip.Title == "Isencao");
     }
+
+    [Fact]
+    public void BuildTips_ShouldAdaptToAmountAndHorizon()
+    {
+        var service = new FixedIncomeTipService();
+
+        var response = service.BuildTips("Tenho 5000 reais para curto prazo em Tesouro Selic");
+
+        Assert.Contains(response.Tips, tip => tip.Title == "Valor informado" && tip.Detail.Contains("R$ 5.000"));
+        Assert.Contains(response.Tips, tip => tip.Title == "Curto prazo");
+        Assert.Contains(response.Tips, tip => tip.Title == "Tesouro Selic");
+    }
 }

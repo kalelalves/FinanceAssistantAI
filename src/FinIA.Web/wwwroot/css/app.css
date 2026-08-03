@@ -147,6 +147,29 @@ code {
     white-space: nowrap;
 }
 
+.mode-switch {
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    display: grid;
+    gap: .25rem;
+    grid-template-columns: 1fr 1fr;
+    padding: .25rem;
+}
+
+.mode-switch button {
+    background: transparent;
+    border: 0;
+    border-radius: 6px;
+    color: #57606a;
+    min-height: 2.4rem;
+}
+
+.mode-switch button.active {
+    background: #0969da;
+    color: white;
+}
+
 .chat-thread {
     display: flex;
     flex: 1;

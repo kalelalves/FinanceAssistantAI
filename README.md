@@ -80,7 +80,7 @@ Content-Type: application/json
 }
 ```
 
-O mesmo chat tambem responde dicas gerais de renda fixa:
+O chat possui selecao de modo para `Renda fixa` ou `Renda variavel`. No modo renda fixa, tambem responde dicas gerais considerando valor, prazo e liquidez quando informados:
 
 ```json
 {

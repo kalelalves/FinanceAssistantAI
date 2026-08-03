@@ -34,7 +34,8 @@ public sealed partial class ChatFunction(
             return new BadRequestObjectResult(new ApiError("chat.empty_message", "Message is required."));
         }
 
-        if (fixedIncomeTipService.CanHandle(payload.Message))
+        var mode = ChatModeExtensions.From(payload.Mode);
+        if (mode == ChatMode.FixedIncome || (mode == ChatMode.Auto && fixedIncomeTipService.CanHandle(payload.Message)))
         {
             var tips = fixedIncomeTipService.BuildTips(payload.Message);
             return new OkObjectResult(new ChatResponse(
@@ -78,7 +79,27 @@ public sealed partial class ChatFunction(
     [GeneratedRegex(@"\b[A-Z]{4}\d{1,2}\b")]
     private static partial Regex TickerRegex();
 
-    private sealed record ChatRequest(string? Message);
+    private sealed record ChatRequest(string? Message, string? Mode);
+
+    private enum ChatMode
+    {
+        Auto,
+        FixedIncome,
+        VariableIncome
+    }
+
+    private static class ChatModeExtensions
+    {
+        public static ChatMode From(string? mode)
+        {
+            return mode?.Trim().ToLowerInvariant() switch
+            {
+                "fixed-income" => ChatMode.FixedIncome,
+                "variable-income" => ChatMode.VariableIncome,
+                _ => ChatMode.Auto
+            };
+        }
+    }
 
     private sealed record ChatResponse(
         string Message,

@@ -9,10 +9,19 @@
         <header class="chat-header">
             <div>
                 <h1>FinIA</h1>
-                <p>Analise fundamentalista objetiva para ate 10 papeis.</p>
+                <p>@ModeDescription</p>
             </div>
-            <span>@TickerCount/10 papeis</span>
+            <span>@ModeStatus</span>
         </header>
+
+        <div class="mode-switch" role="group" aria-label="Tipo de analise">
+            <button type="button" class="@GetModeClass(InvestmentMode.FixedIncome)" @onclick="() => SetMode(InvestmentMode.FixedIncome)">
+                Renda fixa
+            </button>
+            <button type="button" class="@GetModeClass(InvestmentMode.VariableIncome)" @onclick="() => SetMode(InvestmentMode.VariableIncome)">
+                Renda variavel
+            </button>
+        </div>
 
         <div class="chat-thread" aria-live="polite">
             @foreach (var message in messages)
@@ -78,7 +87,7 @@
             <textarea
                 @bind="chatText"
                 @bind:event="oninput"
-                placeholder="Ex.: Analise PETR4, VALE3 e ITUB4"
+                placeholder="@PromptPlaceholder"
                 disabled="@isLoading"></textarea>
             <button type="submit" disabled="@isLoading">Enviar</button>
         </form>
@@ -87,6 +96,7 @@
 
 @code {
     private string chatText = "Analise PETR4 e VALE3";
+    private InvestmentMode selectedMode = InvestmentMode.VariableIncome;
     private string? errorMessage;
     private bool isLoading;
     private ChatResponse? analysisResponse;
@@ -96,6 +106,18 @@
     ];
 
     private int TickerCount => ParseTickers().Count;
+
+    private string ModeDescription => selectedMode == InvestmentMode.FixedIncome
+        ? "Dicas objetivas de renda fixa por valor, prazo e liquidez."
+        : "Analise fundamentalista objetiva para ate 10 papeis.";
+
+    private string ModeStatus => selectedMode == InvestmentMode.FixedIncome
+        ? "renda fixa"
+        : $"{TickerCount}/10 papeis";
+
+    private string PromptPlaceholder => selectedMode == InvestmentMode.FixedIncome
+        ? "Ex.: Tenho 5000 reais, como investir em renda fixa?"
+        : "Ex.: Analise PETR4, VALE3 e ITUB4";
 
     private async Task SubmitAsync()
     {
@@ -109,13 +131,13 @@
             return;
         }
 
-        if (tickers.Count == 0 && !LooksLikeFixedIncomeQuestion(prompt))
+        if (selectedMode == InvestmentMode.VariableIncome && tickers.Count == 0)
         {
-            errorMessage = "Informe ao menos um ticker ou peca dicas de renda fixa.";
+            errorMessage = "Informe ao menos um ticker para renda variavel.";
             return;
         }
 
-        if (tickers.Count > 10)
+        if (selectedMode == InvestmentMode.VariableIncome && tickers.Count > 10)
         {
             errorMessage = "Limite maximo de 10 papeis.";
             return;
@@ -126,7 +148,7 @@
         isLoading = true;
         try
         {
-            using var response = await Http.PostAsJsonAsync("api/chat", new ChatRequest(prompt));
+            using var response = await Http.PostAsJsonAsync("api/chat", new ChatRequest(prompt, ToApiValue(selectedMode)));
             if (!response.IsSuccessStatusCode)
             {
                 errorMessage = "Nao consegui concluir a analise agora. Verifique se o backend esta configurado e tente novamente.";
@@ -160,21 +182,20 @@
             .ToArray();
     }
 
-    private static bool LooksLikeFixedIncomeQuestion(string prompt)
+    private void SetMode(InvestmentMode mode)
     {
-        var normalized = prompt.ToUpperInvariant();
-        return normalized.Contains("RENDA FIXA") ||
-            normalized.Contains("TESOURO") ||
-            normalized.Contains("CDB") ||
-            normalized.Contains("LCI") ||
-            normalized.Contains("LCA") ||
-            normalized.Contains("CRI") ||
-            normalized.Contains("CRA") ||
-            normalized.Contains("DEBENTURE") ||
-            normalized.Contains("CDI") ||
-            normalized.Contains("SELIC") ||
-            normalized.Contains("IPCA") ||
-            normalized.Contains("POUPANCA");
+        selectedMode = mode;
+        errorMessage = null;
+        chatText = mode == InvestmentMode.FixedIncome
+            ? "Tenho 5000 reais, como investir em renda fixa?"
+            : "Analise PETR4 e VALE3";
+    }
+
+    private string GetModeClass(InvestmentMode mode) => selectedMode == mode ? "active" : string.Empty;
+
+    private static string ToApiValue(InvestmentMode mode)
+    {
+        return mode == InvestmentMode.FixedIncome ? "fixed-income" : "variable-income";
     }
 
     private static string FormatMoney(decimal? value)
@@ -182,7 +203,13 @@
         return value is null ? "n/d" : $"R$ {value:0.00}";
     }
 
-    private sealed record ChatRequest(string Message);
+    private enum InvestmentMode
+    {
+        FixedIncome,
+        VariableIncome
+    }
+
+    private sealed record ChatRequest(string Message, string Mode);
 
     private sealed record ChatResponse(
         string Message,

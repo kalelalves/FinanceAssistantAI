@@ -70,6 +70,7 @@ Na tela:
 
 - Chat: digite ate 10 papeis, por exemplo `Analise PETR4 e VALE3`.
 - Renda fixa: peca dicas gerais, por exemplo `Me de dicas de renda fixa para reserva`.
+- Use o switch da tela para alternar entre `Renda fixa` e `Renda variavel`.
 - O usuario nao configura API ou token no frontend.
 
 ## 5. Testar API manualmente
