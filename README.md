@@ -33,6 +33,8 @@ dotnet build FinIA.slnx
 dotnet test FinIA.slnx
 ```
 
+Guia completo para rodar backend, frontend e Supabase localmente: `docs/guia-execucao-local.md`.
+
 O projeto de Functions usa `local.settings.json` apenas localmente. Segredos reais devem ficar fora do Git.
 
 ## Backend
