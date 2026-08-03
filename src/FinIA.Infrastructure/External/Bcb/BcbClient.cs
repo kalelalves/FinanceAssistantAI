@@ -11,7 +11,21 @@ public sealed class BcbClient(HttpClient httpClient) : IBcbClient
     public async Task<BcbIndicatorValue?> GetLatestAsync(BcbSeriesCode series, CancellationToken cancellationToken)
     {
         var path = $"/dados/serie/bcdata.sgs.{(int)series}/dados/ultimos/1?formato=json";
-        var response = await httpClient.GetFromJsonAsync<BcbSeriesResponse[]>(path, cancellationToken);
+        BcbSeriesResponse[]? response;
+
+        try
+        {
+            response = await httpClient.GetFromJsonAsync<BcbSeriesResponse[]>(path, cancellationToken);
+        }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+        catch (TaskCanceledException)
+        {
+            return null;
+        }
+
         var latest = response?.FirstOrDefault();
 
         if (latest is null ||

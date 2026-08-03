@@ -60,11 +60,11 @@
         }
 
         <form class="chat-composer" @onsubmit="SubmitAsync" @onsubmit:preventDefault>
-            <input
+            <textarea
                 @bind="chatText"
                 @bind:event="oninput"
                 placeholder="Ex.: Analise PETR4, VALE3 e ITUB4"
-                disabled="@isLoading" />
+                disabled="@isLoading"></textarea>
             <button type="submit" disabled="@isLoading">Enviar</button>
         </form>
     </section>
@@ -114,7 +114,7 @@
             using var response = await Http.PostAsJsonAsync("api/chat", new ChatRequest(prompt));
             if (!response.IsSuccessStatusCode)
             {
-                errorMessage = $"Erro na analise: {(int)response.StatusCode}";
+                errorMessage = "Nao consegui concluir a analise agora. Verifique se o backend esta configurado e tente novamente.";
                 return;
             }
 

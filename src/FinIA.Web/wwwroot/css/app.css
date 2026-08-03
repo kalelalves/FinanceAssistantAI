@@ -184,11 +184,13 @@ code {
     grid-template-columns: 1fr auto;
 }
 
-.chat-composer input {
+.chat-composer input,
+.chat-composer textarea {
     border: 1px solid #d0d7de;
     border-radius: 6px;
     min-height: 2.8rem;
     padding: .65rem .75rem;
+    resize: vertical;
     width: 100%;
 }
 
@@ -202,7 +204,8 @@ code {
 }
 
 .chat-composer button:disabled,
-.chat-composer input:disabled {
+.chat-composer input:disabled,
+.chat-composer textarea:disabled {
     opacity: .7;
 }
 

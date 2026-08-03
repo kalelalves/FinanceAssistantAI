@@ -22,4 +22,16 @@ public sealed class BcbClientTests
         Assert.Equal(new DateOnly(2026, 8, 1), result.Date);
         Assert.Equal(15.00m, result.Value);
     }
+
+    [Fact]
+    public async Task GetLatestAsync_ShouldReturnNullWhenBcbTimesOut()
+    {
+        var handler = new StubHttpMessageHandler(_ => throw new TaskCanceledException("timeout"));
+        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.bcb.gov.br") };
+        var client = new BcbClient(httpClient);
+
+        var result = await client.GetLatestAsync(BcbSeriesCode.SelicMeta, CancellationToken.None);
+
+        Assert.Null(result);
+    }
 }

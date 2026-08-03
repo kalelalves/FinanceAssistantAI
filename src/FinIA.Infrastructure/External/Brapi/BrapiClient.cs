@@ -15,18 +15,40 @@ public sealed class BrapiClient(HttpClient httpClient, FinIaOptions options) : I
             path += $"&token={Uri.EscapeDataString(options.BrapiToken)}";
         }
 
-        var response = await httpClient.GetFromJsonAsync<BrapiQuoteResponse>(path, cancellationToken);
-        var result = response?.Results?.FirstOrDefault();
+        HttpResponseMessage httpResponse;
+        try
+        {
+            httpResponse = await httpClient.GetAsync(path, cancellationToken);
+        }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+        catch (TaskCanceledException)
+        {
+            return null;
+        }
 
-        return result is null
-            ? null
-            : new AssetQuote(
-                Ticker: result.Symbol ?? ticker,
-                RegularMarketPrice: result.RegularMarketPrice,
-                DividendYield: result.DividendYield,
-                PriceToEarnings: result.PriceToEarnings,
-                Currency: result.Currency,
-                LongName: result.LongName);
+        using (httpResponse)
+        {
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var response = await httpResponse.Content.ReadFromJsonAsync<BrapiQuoteResponse>(cancellationToken);
+            var result = response?.Results?.FirstOrDefault();
+
+            return result is null
+                ? null
+                : new AssetQuote(
+                    Ticker: result.Symbol ?? ticker,
+                    RegularMarketPrice: result.RegularMarketPrice,
+                    DividendYield: result.DividendYield,
+                    PriceToEarnings: result.PriceToEarnings,
+                    Currency: result.Currency,
+                    LongName: result.LongName);
+        }
     }
 
     public static void Configure(HttpClient client, FinIaOptions options)
