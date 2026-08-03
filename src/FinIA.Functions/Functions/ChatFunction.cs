@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using FinIA.Application.Analyses;
 using FinIA.Application.Auth;
 using FinIA.Application.Common;
+using FinIA.Application.FixedIncome;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -11,7 +12,8 @@ namespace FinIA.Functions.Functions;
 
 public sealed partial class ChatFunction(
     IAnalysisRequestValidator requestValidator,
-    IAnalysisApplicationService analysisApplicationService)
+    IAnalysisApplicationService analysisApplicationService,
+    IFixedIncomeTipService fixedIncomeTipService)
 {
     private static readonly AuthenticatedUser ChatUser = new(
         Guid.Parse("11111111-1111-1111-1111-111111111111"),
@@ -30,6 +32,15 @@ public sealed partial class ChatFunction(
         if (string.IsNullOrWhiteSpace(payload?.Message))
         {
             return new BadRequestObjectResult(new ApiError("chat.empty_message", "Message is required."));
+        }
+
+        if (fixedIncomeTipService.CanHandle(payload.Message))
+        {
+            var tips = fixedIncomeTipService.BuildTips(payload.Message);
+            return new OkObjectResult(new ChatResponse(
+                Message: tips.Message,
+                Results: [],
+                FixedIncomeTips: tips.Tips.Select(ChatFixedIncomeTip.From).ToArray()));
         }
 
         var tickers = TickerRegex()
@@ -53,7 +64,8 @@ public sealed partial class ChatFunction(
 
         return new OkObjectResult(new ChatResponse(
             Message: BuildMessage(analysis.Results),
-            Results: analysis.Results.Select(ChatAssetResponse.From).ToArray()));
+            Results: analysis.Results.Select(ChatAssetResponse.From).ToArray(),
+            FixedIncomeTips: []));
     }
 
     private static string BuildMessage(IReadOnlyCollection<AssetAnalysisResponse> results)
@@ -70,7 +82,8 @@ public sealed partial class ChatFunction(
 
     private sealed record ChatResponse(
         string Message,
-        IReadOnlyCollection<ChatAssetResponse> Results);
+        IReadOnlyCollection<ChatAssetResponse> Results,
+        IReadOnlyCollection<ChatFixedIncomeTip> FixedIncomeTips);
 
     private sealed record ChatAssetResponse(
         string Ticker,
@@ -91,6 +104,16 @@ public sealed partial class ChatFunction(
                 response.Diagnosis.ToString(),
                 response.Summary,
                 response.Source);
+        }
+    }
+
+    private sealed record ChatFixedIncomeTip(
+        string Title,
+        string Detail)
+    {
+        public static ChatFixedIncomeTip From(FixedIncomeTip tip)
+        {
+            return new ChatFixedIncomeTip(tip.Title, tip.Detail);
         }
     }
 }

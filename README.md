@@ -80,6 +80,14 @@ Content-Type: application/json
 }
 ```
 
+O mesmo chat tambem responde dicas gerais de renda fixa:
+
+```json
+{
+  "message": "Me de dicas de renda fixa para reserva"
+}
+```
+
 O frontend usa apenas o chat e nao exibe configuracao de API ou token para o usuario.
 
 ## Clientes Externos

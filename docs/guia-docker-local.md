@@ -69,6 +69,7 @@ http://localhost:5027
 Na tela:
 
 - Chat: digite ate 10 papeis, por exemplo `Analise PETR4 e VALE3`.
+- Renda fixa: peca dicas gerais, por exemplo `Me de dicas de renda fixa para reserva`.
 - O usuario nao configura API ou token no frontend.
 
 ## 5. Testar API manualmente

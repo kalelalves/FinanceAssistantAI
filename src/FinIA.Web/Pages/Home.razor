@@ -54,6 +54,21 @@
             </section>
         }
 
+        @if (analysisResponse?.FixedIncomeTips.Count > 0)
+        {
+            <section class="results-grid" aria-label="Dicas de renda fixa">
+                @foreach (var tip in analysisResponse.FixedIncomeTips)
+                {
+                    <article class="result-card">
+                        <header>
+                            <strong>@tip.Title</strong>
+                        </header>
+                        <p>@tip.Detail</p>
+                    </article>
+                }
+            </section>
+        }
+
         @if (!string.IsNullOrWhiteSpace(errorMessage))
         {
             <p class="error">@errorMessage</p>
@@ -77,7 +92,7 @@
     private ChatResponse? analysisResponse;
     private readonly List<ChatMessage> messages =
     [
-        new("assistant", "Digite os papeis que deseja avaliar. Eu retorno preco-alvo, horizonte e diagnostico.")
+        new("assistant", "Digite os papeis que deseja avaliar ou peca dicas de renda fixa.")
     ];
 
     private int TickerCount => ParseTickers().Count;
@@ -152,9 +167,14 @@
 
     private sealed record ChatRequest(string Message);
 
-    private sealed record ChatResponse(string Message, IReadOnlyCollection<AssetResult> Results);
+    private sealed record ChatResponse(
+        string Message,
+        IReadOnlyCollection<AssetResult> Results,
+        IReadOnlyCollection<FixedIncomeTip> FixedIncomeTips);
 
     private sealed record ChatMessage(string Role, string Text);
+
+    private sealed record FixedIncomeTip(string Title, string Detail);
 
     private sealed record AssetResult(
         string Ticker,

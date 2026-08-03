@@ -1,6 +1,7 @@
 using FinIA.Application.Analyses;
 using FinIA.Application.Auth;
 using FinIA.Application.Configuration;
+using FinIA.Application.FixedIncome;
 using FinIA.Application.Fundamentals;
 using FinIA.Application.Health;
 using FinIA.Application.Security;
@@ -38,6 +39,7 @@ public static class DependencyInjection
         services.AddSingleton<IUserAnonymizer, HmacSha256UserAnonymizer>();
         services.AddSingleton<IAnalysisApplicationService, AnalysisApplicationService>();
         services.AddSingleton<IFundamentalAnalysisService, FundamentalAnalysisService>();
+        services.AddSingleton<IFixedIncomeTipService, FixedIncomeTipService>();
 
         return services;
     }

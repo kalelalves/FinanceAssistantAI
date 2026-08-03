@@ -171,6 +171,7 @@ http://localhost:5027
 Na tela do FinIA:
 
 - Chat: informe ate 10 papeis em linguagem natural, por exemplo `Analise PETR4 e VALE3`.
+- Renda fixa: peca dicas gerais, por exemplo `Me de dicas de renda fixa para reserva`.
 - O usuario nao configura API ou token no frontend.
 
 ## 8. Validar antes de commitar
