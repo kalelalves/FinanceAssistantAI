@@ -69,6 +69,19 @@ Content-Type: application/json
 O endpoint rejeita requisicoes sem Bearer token valido e bloqueia mais de 10 tickers antes de qualquer chamada externa.
 Quando validado, o backend salva a solicitacao, busca indicadores macro, consulta Brapi, calcula fundamentos e retorna respostas compactas.
 
+Chat do frontend:
+
+```text
+POST http://localhost:7071/api/chat
+Content-Type: application/json
+
+{
+  "message": "Analise PETR4 e VALE3"
+}
+```
+
+O frontend usa apenas o chat e nao exibe configuracao de API ou token para o usuario.
+
 ## Clientes Externos
 
 - `IBcbClient`: consulta series SGS do Banco Central.

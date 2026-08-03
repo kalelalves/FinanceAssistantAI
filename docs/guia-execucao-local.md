@@ -170,9 +170,8 @@ http://localhost:5027
 
 Na tela do FinIA:
 
-- Campo `API`: informe `http://localhost:7071` ou `http://localhost:7078`, conforme a porta usada no backend.
-- Campo `Bearer token`: cole o JWT do Supabase.
-- Campo `Tickers`: informe ate 10 papeis, por exemplo `PETR4, VALE3, ITUB4`.
+- Chat: informe ate 10 papeis em linguagem natural, por exemplo `Analise PETR4 e VALE3`.
+- O usuario nao configura API ou token no frontend.
 
 ## 8. Validar antes de commitar
 
@@ -205,7 +204,7 @@ O health retorna degradado quando alguma configuracao obrigatoria esta ausente. 
 Confirme:
 
 - Backend esta rodando.
-- Porta da API no frontend esta correta.
+- A Function esta acessivel em `http://localhost:7071/api/chat`.
 - CORS esta configurado no ambiente quando rodar fora do localhost.
 - Token Supabase nao expirou.
 

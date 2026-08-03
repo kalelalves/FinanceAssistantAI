@@ -40,7 +40,8 @@ docker compose up --build
 Servicos:
 
 - Frontend: `http://localhost:5027`
-- Backend: `http://localhost:7071/api`
+- Backend direto: `http://localhost:7071/api`
+- Backend via frontend: `http://localhost:5027/api`
 - Postgres: `localhost:5432`
 - Azurite Blob: `localhost:10000`
 - Azurite Queue: `localhost:10001`
@@ -52,6 +53,7 @@ Em outro terminal:
 
 ```powershell
 Invoke-RestMethod http://localhost:7071/api/health
+Invoke-RestMethod http://localhost:5027/api/health
 ```
 
 Se algum segredo obrigatorio estiver ausente, o health pode retornar degradado.
@@ -66,9 +68,8 @@ http://localhost:5027
 
 Na tela:
 
-- API: `http://localhost:7071`
-- Bearer token: JWT valido do Supabase.
-- Tickers: ate 10 papeis, por exemplo `PETR4, VALE3`.
+- Chat: digite ate 10 papeis, por exemplo `Analise PETR4 e VALE3`.
+- O usuario nao configura API ou token no frontend.
 
 ## 5. Testar API manualmente
 
@@ -137,4 +138,5 @@ docker compose up --build
 
 ### Erro 401 na analise
 
-O Docker Compose sobe o banco local, mas a autenticacao ainda depende de um JWT Supabase valido e do `SUPABASE_JWT_SECRET` correto.
+O endpoint tecnico `/api/analyses` depende de um JWT Supabase valido e do `SUPABASE_JWT_SECRET` correto.
+No frontend, use o chat em `/api/chat`.
