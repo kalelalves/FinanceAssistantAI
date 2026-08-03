@@ -109,9 +109,9 @@
             return;
         }
 
-        if (tickers.Count == 0)
+        if (tickers.Count == 0 && !LooksLikeFixedIncomeQuestion(prompt))
         {
-            errorMessage = "Informe ao menos um ticker na conversa.";
+            errorMessage = "Informe ao menos um ticker ou peca dicas de renda fixa.";
             return;
         }
 
@@ -158,6 +158,23 @@
             .Select(ticker => ticker.ToUpperInvariant())
             .Distinct()
             .ToArray();
+    }
+
+    private static bool LooksLikeFixedIncomeQuestion(string prompt)
+    {
+        var normalized = prompt.ToUpperInvariant();
+        return normalized.Contains("RENDA FIXA") ||
+            normalized.Contains("TESOURO") ||
+            normalized.Contains("CDB") ||
+            normalized.Contains("LCI") ||
+            normalized.Contains("LCA") ||
+            normalized.Contains("CRI") ||
+            normalized.Contains("CRA") ||
+            normalized.Contains("DEBENTURE") ||
+            normalized.Contains("CDI") ||
+            normalized.Contains("SELIC") ||
+            normalized.Contains("IPCA") ||
+            normalized.Contains("POUPANCA");
     }
 
     private static string FormatMoney(decimal? value)
